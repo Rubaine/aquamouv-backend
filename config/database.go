@@ -1,72 +1,65 @@
 package config
 
 import (
-	"context"
+	"fmt"
 	"os"
+	"remy-aquavelo/models"
 
-	"github.com/jackc/pgx/v4"
 	"github.com/kataras/golog"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // InitPSQL initializes a PostgreSQL connection and creates a users table if it doesn't exist.
 // It reads the database connection details from environment variables: DB_USER, DB_PASSWORD, DB_HOST, and DB_NAME.
 // It returns a context and a *pgx.ConnConfig.
-func InitPSQL() (context.Context, *pgx.ConnConfig) {
-	connstring := "postgres://"
+func InitPSQL() *gorm.DB {
+
+	var host, user, password, dbname, port string
 
 	if env := os.Getenv("DB_USER"); env == "" {
 		golog.Fatal("Bad 'DB_USER' environment variable")
 	} else {
-		connstring += env
+		user = env
 	}
 
 	if env := os.Getenv("DB_PASSWORD"); env == "" {
 		golog.Warn("'DB_PASSWORD' environment variable not set")
 	} else {
-		connstring += ":" + env
+		password = env
 	}
 
 	if env := os.Getenv("DB_HOST"); env == "" {
 		golog.Fatal("Bad 'DB_HOST' environment variable")
 		os.Exit(1)
 	} else {
-		connstring += "@" + env
+		host = env
+	}
+
+	if env := os.Getenv("DB_PORT"); env == "" {
+		golog.Fatal("Bad 'DB_PORT' environment variable")
+		os.Exit(1)
+	} else {
+		port = env
 	}
 
 	if env := os.Getenv("DB_NAME"); env == "" {
 		golog.Fatal("Bad 'DB_NAME' parameter env")
 	} else {
-		connstring += "/" + env
+		dbname = env
 	}
 
-	connstring += "?sslmode=disable"
+	dsn :=  fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Paris", host, user, password, dbname, port)
 
-	connConf, err := pgx.ParseConfig(connstring)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		golog.Fatalf("Parse error : %v", err)
+		golog.Fatal("failed to connect database")
 	}
+  
+	// Migrate the schema
+	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.ContactInfo{})
 
-	sqlCo, err := pgx.ConnectConfig(context.Background(), connConf)
-	if err != nil {
-		golog.Errorf("Connection error : %v", err)
-		return context.Background(), connConf
-	}
-
-	defer sqlCo.Close(context.Background())
-
-	query := `
-		CREATE TABLE IF NOT EXISTS users (
-			id SERIAL PRIMARY KEY,
-			username VARCHAR(50) UNIQUE NOT NULL,
-			password VARCHAR(50) NOT NULL,
-			mail VARCHAR(50) NOT NULL
-		);
-	`
-
-	_, err = sqlCo.Exec(context.Background(), query)
-	if err != nil {
-		golog.Errorf("Error creating table : %v", err)
-	}
-	return context.Background(), connConf
+	return db
 
 }

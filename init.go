@@ -2,7 +2,6 @@ package main
 
 import (
 	"remy-aquavelo/config"
-	"remy-aquavelo/models/postgresql"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -20,6 +19,6 @@ func init() {
 	config.Cfg.App = config.InitApp()
 	golog.SetLevel(config.Cfg.App.DebugLevel)
 
-	postgresql.SQLCtx, postgresql.SQLConn = config.InitPSQL()
+	config.Cfg.DB = config.InitPSQL()
 	golog.Debug("init successful in " + time.Since(config.Cfg.App.StartedTime).String())
 }
