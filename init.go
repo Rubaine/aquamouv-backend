@@ -18,7 +18,6 @@ func init() {
 
 	config.Cfg.App = config.InitApp()
 	golog.SetLevel(config.Cfg.App.DebugLevel)
-
 	config.Cfg.DB = config.InitPSQL()
 	golog.Debug("init successful in " + time.Since(config.Cfg.App.StartedTime).String())
 }

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/golog"
 
 	"github.com/kataras/iris/v12"
@@ -38,6 +39,16 @@ func main() {
 	}
 
 	router.Use(iris.Compression)
+
+	crs := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedHeaders: []string{"*"},
+		AllowedMethods: []string{"GET", "POST"},
+		AllowCredentials: true,
+	})
+
+	router.UseRouter(crs)
+	router.AllowMethods(iris.MethodOptions)
 
 	router.Get("/", func(c iris.Context) {
 		c.JSON(struct{ Message string }{Message: "Welcome to the oui API (ahah t'a caté la ref)"})
