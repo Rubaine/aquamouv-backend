@@ -3,9 +3,12 @@ package contact
 import (
 	"remy-aquavelo/config"
 	"remy-aquavelo/models"
+	"time"
 
 	"github.com/kataras/iris/v12"
 )
+
+var c = iris.Cache(10 * time.Second)
 
 func ContactSubmitHandler(ctx iris.Context){
 	var user models.ContactInfo
@@ -22,7 +25,7 @@ func ContactSubmitHandler(ctx iris.Context){
 		return
 	}
 
-	sendMail(user.Email)
+	sendMailAsync(user.Email)
 	
 	ctx.StatusCode(iris.StatusOK)
 	ctx.JSON(iris.Map{"message": "Contact information stored successfully"})

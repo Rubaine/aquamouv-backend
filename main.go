@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"remy-aquavelo/config"
-	"remy-aquavelo/handlers/auth"
 	"remy-aquavelo/handlers/contact"
 	"strings"
 	"time"
@@ -54,9 +53,6 @@ func main() {
 		c.JSON(struct{ Message string }{Message: "Welcome to the oui API (ahah t'a caté la ref)"})
 	})
 
-	router.Post("/auth/signup", auth.SignupHandler)
-
-	
 	router.Post("/contact", contact.ContactSubmitHandler)
 
 	err := router.Listen(":" + config.Cfg.App.Port)

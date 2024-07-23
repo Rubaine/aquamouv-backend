@@ -57,7 +57,6 @@ func InitPSQL() *gorm.DB {
 	}
   
 	// Migrate the schema
-	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.ContactInfo{})
 
 	return db
