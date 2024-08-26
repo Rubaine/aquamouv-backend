@@ -19,19 +19,19 @@ func sendMailAsync(destinationEmail string, firstName string, lastName string) {
 
 Bonjour %s %s,
 
-Nous avons bien reçu votre demande pour une séance découverte gratuite. Le centre Aquavelo de Senlis est heureux de vous accueillir pour 
-vous faire essayer un cours d'aquabiking coaché par des professeurs de sport diplômés à la suite d'un bilan durant lequel nous définirons 
-vos besoins et vos objectifs. 
-Prenez vite rendez-vous avec le centre Aquavelo de Senlis en appelant au 06 20 52 17 37. Pour effectuer votre séance, pensez à prendre un 
+Nous avons bien reçu votre demande pour une séance découverte gratuite. Le centre Aquamouv de Senlis est heureux de vous accueillir pour 
+vous faire essayer un cours d'aquabiking coaché par des professeurs de sport diplômés.
+
+Prenez vite rendez-vous avec le centre Aquamouv de Senlis en appelant au 06 20 52 17 37. Pour effectuer votre séance, pensez à prendre un 
 maillot de bain, une serviette de bain, un gel douche, une bouteille d'eau et des chaussures d'aquavélo.
 
 Horaires d'ouverture: Du Lundi au vendredi 9h-20h / Samedi 9h-16h / Dimanche 9h-15h / Jours Fériés horaires du week-end 
-Adresse: 60300 Senlis, France
+Adresse: 6H Av. du Poteau, 60300 Chamant, France (à côté du Norauto)
 
 *Offre non cumulable.
 
 Cordialement,
-L'équipe Aquavelo`, lastName, firstName)
+L'équipe Aquamouv`, lastName, firstName)
 
 		err := smtp.SendMail(
 			os.Getenv("MAIL_HOST")+":"+os.Getenv("MAIL_PORT"),
