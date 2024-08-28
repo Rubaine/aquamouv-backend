@@ -1,6 +1,7 @@
 package contact
 
 import (
+	"os"
 	"remy-aquavelo/config"
 	"remy-aquavelo/models"
 
@@ -23,6 +24,8 @@ func ContactSubmitHandler(ctx iris.Context) {
 	}
 
 	sendMailAsync(user.Email, user.FirstName, user.LastName)
+
+	sendMailToManager(os.Getenv("MAIL_USER"), user.FirstName, user.LastName, user.Phone)
 
 	ctx.StatusCode(iris.StatusOK)
 	ctx.JSON(iris.Map{"message": "Contact information stored successfully"})

@@ -46,3 +46,35 @@ L'équipe Aquamouv`, lastName, firstName)
 		}
 	}()
 }
+
+func sendMailToManager(destinationEmail string, firstName string, lastName string, phoneNumber string) {
+	go func() {
+		auth := smtp.PlainAuth(
+			"",
+			os.Getenv("MAIL_USER"),
+			os.Getenv("MAIL_PASSWORD"),
+			os.Getenv("MAIL_HOST"),
+		)
+
+		msg := fmt.Sprintf(`Subject: Nouvelle demande de séance d'essai
+
+Bonjour Patricia,
+
+M. %s %s a demandé à faire une séance d'essai. Merci de le rappeler au plus vite au: %s
+
+Cordialement,
+L'équipe Aquamouv`, lastName, firstName, phoneNumber)
+
+		err := smtp.SendMail(
+			os.Getenv("MAIL_HOST")+":"+os.Getenv("MAIL_PORT"),
+			auth,
+			os.Getenv("MAIL_USER"),
+			[]string{destinationEmail},
+			[]byte(msg),
+		)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+}
