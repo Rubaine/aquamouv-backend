@@ -2,8 +2,10 @@ package contact
 
 import (
 	"fmt"
+	"net/mail"
 	"net/smtp"
 	"os"
+	"strings"
 )
 
 func sendMailAsync(destinationEmail string, firstName string, lastName string) {
@@ -15,7 +17,12 @@ func sendMailAsync(destinationEmail string, firstName string, lastName string) {
 			os.Getenv("MAIL_HOST"),
 		)
 
-		msg := fmt.Sprintf(`Subject: Contact Information Aquamouv
+		msg := fmt.Sprintf(`From: %s
+To: %s
+Subject: =?UTF-8?B?%s?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
 Bonjour %s %s,
 
@@ -31,7 +38,7 @@ Adresse: 6H Av. du Poteau, 60300 Chamant, France (à côté du Norauto)
 *Offre non cumulable.
 
 Cordialement,
-L'équipe Aquamouv`, lastName, firstName)
+L'équipe Aquamouv`, os.Getenv("MAIL_USER"), destinationEmail, encodeRFC2047("Contact Information Aquamouv"), lastName, firstName)
 
 		err := smtp.SendMail(
 			os.Getenv("MAIL_HOST")+":"+os.Getenv("MAIL_PORT"),
@@ -47,7 +54,7 @@ L'équipe Aquamouv`, lastName, firstName)
 	}()
 }
 
-func sendMailToManager(destinationEmail string, firstName string, lastName string, phoneNumber string) {
+func sendMailToManager(destinationEmail string, firstName string, lastName string, phoneNumber string, email string) {
 	go func() {
 		auth := smtp.PlainAuth(
 			"",
@@ -56,14 +63,19 @@ func sendMailToManager(destinationEmail string, firstName string, lastName strin
 			os.Getenv("MAIL_HOST"),
 		)
 
-		msg := fmt.Sprintf(`Subject: Nouvelle demande de séance d'essai
+		msg := fmt.Sprintf(`From: %s
+To: %s
+Subject: =?UTF-8?B?%s?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
 Bonjour Patricia,
 
-M. %s %s a demandé à faire une séance d'essai. Merci de le rappeler au plus vite au: %s
+M. %s %s a demandé à faire une séance d'essai. Merci de le rappeler au plus vite au: %s ou de le contacter par mail à: %s.
 
 Cordialement,
-L'équipe Aquamouv`, lastName, firstName, phoneNumber)
+L'équipe Aquamouv`, os.Getenv("MAIL_USER"), destinationEmail, encodeRFC2047("Nouvelle demande de séance d'essai"), lastName, firstName, phoneNumber, email)
 
 		err := smtp.SendMail(
 			os.Getenv("MAIL_HOST")+":"+os.Getenv("MAIL_PORT"),
@@ -77,4 +89,11 @@ L'équipe Aquamouv`, lastName, firstName, phoneNumber)
 			fmt.Println(err)
 		}
 	}()
+}
+
+// encodeRFC2047 encode un string pour être compatible avec le format de sujet d'email
+func encodeRFC2047(String string) string {
+	// UTF-8 avec base64 encoding
+	addr := mail.Address{Name: String, Address: ""}
+	return strings.Trim(addr.String(), " <>")
 }

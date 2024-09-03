@@ -25,7 +25,7 @@ func ContactSubmitHandler(ctx iris.Context) {
 
 	sendMailAsync(user.Email, user.FirstName, user.LastName)
 
-	sendMailToManager(os.Getenv("MAIL_USER"), user.FirstName, user.LastName, user.Phone)
+	sendMailToManager(os.Getenv("MAIL_USER"), user.FirstName, user.LastName, user.Phone, user.Email)
 
 	ctx.StatusCode(iris.StatusOK)
 	ctx.JSON(iris.Map{"message": "Contact information stored successfully"})
