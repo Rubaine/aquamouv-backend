@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"remy-aquavelo/config"
 	"remy-aquavelo/handlers/contact"
 	"strings"
@@ -28,6 +29,14 @@ func debugLogger() iris.Handler {
 }
 
 func main() {
+
+	logFile, err := os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		golog.Fatal(err)
+	}
+	defer logFile.Close()
+	golog.SetOutput(logFile)
+
 	golog.Info("Starting server")
 
 	router := iris.New()
@@ -40,9 +49,9 @@ func main() {
 	router.Use(iris.Compression)
 
 	crs := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedHeaders: []string{"*"},
-		AllowedMethods: []string{"GET", "POST"},
+		AllowedOrigins:   []string{"*"},
+		AllowedHeaders:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST"},
 		AllowCredentials: true,
 	})
 
@@ -55,7 +64,7 @@ func main() {
 
 	router.Post("/contact", contact.ContactSubmitHandler)
 
-	err := router.Listen(":" + config.Cfg.App.Port)
+	err = router.Listen(":" + config.Cfg.App.Port)
 	if err != nil {
 		golog.Fatal(err)
 	}

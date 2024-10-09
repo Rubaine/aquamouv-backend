@@ -4,10 +4,14 @@ import (
 	"fmt"
 	"net/smtp"
 	"os"
+
+	"github.com/kataras/golog"
 )
 
 func sendMailAsync(destinationEmail string, firstName string, lastName string) {
 	go func() {
+		golog.Info("Starting sendMailAsync goroutine")
+
 		auth := smtp.PlainAuth(
 			"",
 			os.Getenv("MAIL_USER"),
@@ -35,6 +39,7 @@ L'équipe Aquamouv`, lastName, firstName)
 		msg := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"utf-8\"\r\n\r\n%s",
 			os.Getenv("MAIL_USER"), destinationEmail, subject, body)
 
+		golog.Info("Sending email to:", destinationEmail)
 		err := smtp.SendMail(
 			os.Getenv("MAIL_HOST")+":"+os.Getenv("MAIL_PORT"),
 			auth,
@@ -44,13 +49,17 @@ L'équipe Aquamouv`, lastName, firstName)
 		)
 
 		if err != nil {
-			fmt.Println(err)
+			golog.Error("Failed to send email:", err)
+		} else {
+			golog.Info("Email sent successfully to:", destinationEmail)
 		}
 	}()
 }
 
 func sendMailToManager(destinationEmail string, firstName string, lastName string, phoneNumber string, email string) {
 	go func() {
+		golog.Info("Starting sendMailToManager goroutine")
+
 		auth := smtp.PlainAuth(
 			"",
 			os.Getenv("MAIL_USER"),
@@ -69,6 +78,7 @@ L'équipe Aquamouv`, lastName, firstName, phoneNumber, email)
 		msg := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"utf-8\"\r\n\r\n%s",
 			os.Getenv("MAIL_USER"), destinationEmail, subject, body)
 
+		golog.Info("Sending email to manager:", destinationEmail)
 		err := smtp.SendMail(
 			os.Getenv("MAIL_HOST")+":"+os.Getenv("MAIL_PORT"),
 			auth,
@@ -78,7 +88,9 @@ L'équipe Aquamouv`, lastName, firstName, phoneNumber, email)
 		)
 
 		if err != nil {
-			fmt.Println(err)
+			golog.Error("Failed to send email to manager:", err)
+		} else {
+			golog.Info("Email sent successfully to manager:", destinationEmail)
 		}
 	}()
 }
